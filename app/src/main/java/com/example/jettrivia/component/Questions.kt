@@ -1,5 +1,7 @@
 package com.example.jettrivia.component
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -42,22 +44,34 @@ import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.jettrivia.model.QuestionIndex
 import com.example.jettrivia.model.QuestionItem
 import com.example.jettrivia.screens.QuestionsViewModel
 import com.example.jettrivia.util.AppColors
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun Questions(viewModel: QuestionsViewModel) {
     val questions = viewModel.data.value.data?.toMutableList()
 
-    val questionIndex = remember {
-        mutableIntStateOf(0)
-    }
-
     if(viewModel.data.value.loading == true){
-        CircularProgressIndicator()
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            CircularProgressIndicator()
+        }
     }
     else{
+        val index = viewModel.index.value
+
+//        Log.d("index_value", "Questions: ${index!!.index}")
+
+        val questionIndex = remember {
+            mutableIntStateOf(index!!.index)
+        }
+
         val question = try {
             questions?.get(questionIndex.intValue)
         } catch (ex:Exception){
@@ -70,11 +84,21 @@ fun Questions(viewModel: QuestionsViewModel) {
                 viewModel = viewModel,
                 onNextClick = {
                     if (questionIndex.intValue < questions.size - 1)
-                    questionIndex.intValue += 1
+                        questionIndex.intValue += 1
+                    viewModel.addIndex(
+                        QuestionIndex(
+                            index = questionIndex.intValue
+                        )
+                    )
                 },
                 onBackClick = {
                     if(questionIndex.intValue > 0)
                         questionIndex.intValue -= 1
+                    viewModel.addIndex(
+                        QuestionIndex(
+                            index = questionIndex.intValue
+                        )
+                    )
                 }
             )
         }
@@ -159,7 +183,14 @@ fun QuestionDisplay(
                                 ),
                                 shape = RoundedCornerShape(15.dp)
                             )
-                            .clip (RoundedCornerShape(topStartPercent = 50, topEndPercent = 50, bottomStartPercent = 50, bottomEndPercent = 50))
+                            .clip(
+                                RoundedCornerShape(
+                                    topStartPercent = 50,
+                                    topEndPercent = 50,
+                                    bottomStartPercent = 50,
+                                    bottomEndPercent = 50
+                                )
+                            )
                             .background(Color.Transparent),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -337,7 +368,14 @@ fun ShowProgress(score:Int){
                 ),
                 shape = RoundedCornerShape(34.dp)
             )
-            .clip(RoundedCornerShape(topStartPercent = 50, topEndPercent = 50, bottomStartPercent = 50, bottomEndPercent = 50))
+            .clip(
+                RoundedCornerShape(
+                    topStartPercent = 50,
+                    topEndPercent = 50,
+                    bottomStartPercent = 50,
+                    bottomEndPercent = 50
+                )
+            )
             .background(Color.Transparent),
         verticalAlignment = Alignment.CenterVertically
     ) {

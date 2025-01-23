@@ -6,6 +6,9 @@ plugins {
     //hilt dependencies
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
+
+    //ksp
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -84,6 +87,14 @@ dependencies {
     implementation (libs.retrofit)
     //GSON converter
     implementation (libs.converter.gson)
+
+    //room
+
+    implementation(libs.androidx.room.runtime)
+
+    ksp(libs.androidx.room.compiler)
+
+    implementation(libs.androidx.room.ktx)
 }
 
 kapt {
